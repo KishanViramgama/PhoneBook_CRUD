@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PhoneBook</string>
+    <string name="create_contact">Create contact</string>
+    <string name="error">Some thing went to wrong</string>
+</resources>
