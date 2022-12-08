@@ -1,5 +1,25 @@
 <resources>
     <string name="app_name">PhoneBook</string>
+
+    <string name="home">Home</string>
     <string name="create_contact">Create contact</string>
+
     <string name="error">Some thing went to wrong</string>
+
+    <string name="submit">Submit</string>
+
+    <string name="name">Name</string>
+    <string name="sureName">Sure name</string>
+    <string name="company">Company</string>
+    <string name="email">Email</string>
+    <string name="phoneNo">Phone no</string>
+
+    <string name="please_enter_name">Please enter name</string>
+    <string name="please_enter_sureName">Please enter sure name</string>
+    <string name="please_enter_company">Please enter company</string>
+    <string name="please_enter_email">Please enter email</string>
+    <string name="please_enter_phoneNo">Please enter phone no</string>
+
+    <string name="createContactSuccess">Create contact success fully</string>
+
 </resources>

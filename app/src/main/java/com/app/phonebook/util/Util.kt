@@ -21,8 +21,23 @@ class Util {
 
     @Provides
     @Singleton
-    fun provideDatabaseClient(context: Context): DatabaseClient{
+    fun provideDatabaseClient(context: Context): DatabaseClient {
         return DatabaseClient(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideMethod():Method{
+        return Method()
+    }
+
+    /*@Provides
+    @Singleton
+    fun provideInsetData(): MutableLiveData<PhoneBook> = MutableLiveData()
+
+    @Singleton
+    fun provideInsetData(mutableData: MutableLiveData<PhoneBook>): LiveData<PhoneBook> {
+        return mutableData
+    }*/
 
 }

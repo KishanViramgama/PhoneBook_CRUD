@@ -11,17 +11,4 @@ class DatabaseClient(context: Context) {
             .allowMainThreadQueries()
             .build()
 
-    /*companion object {
-        @SuppressLint("StaticFieldLeak")
-        private var mInstance: DatabaseClient? = null
-
-        @Synchronized
-        fun getInstance(context: Context): DatabaseClient? {
-            if (mInstance == null) {
-                mInstance = DatabaseClient(context)
-            }
-            return mInstance
-        }
-    }*/
-
 }

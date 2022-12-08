@@ -1,4 +1,4 @@
-package com.app.phonebook.ui.createcontact.item
+package com.app.phonebook.ui.home.item
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
