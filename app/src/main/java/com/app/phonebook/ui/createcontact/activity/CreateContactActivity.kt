@@ -1,5 +1,6 @@
 package com.app.phonebook.ui.createcontact.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -27,8 +28,9 @@ import com.app.phonebook.util.Method
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
-class CreateContact : ComponentActivity() {
+class CreateContactActivity : ComponentActivity() {
 
     //Name
     private var name by mutableStateOf("")
@@ -57,9 +59,6 @@ class CreateContact : ComponentActivity() {
 
     @Inject
     lateinit var method: Method
-
-    /* @Inject
-     lateinit var mutableLiveData: MutableLiveData<PhoneBook>*/
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,12 +140,10 @@ class CreateContact : ComponentActivity() {
                                                 null, name, surname, company, email, phone
                                             )
                                         )
-                                        /*mutableLiveData.value = PhoneBook(
-                                            null, name, surname, company, email, phone
-                                        )*/
+                                        setResult(RESULT_OK, Intent().putExtra("data", ""))
                                         finish()
                                         Toast.makeText(
-                                            this@CreateContact,
+                                            this@CreateContactActivity,
                                             resources.getString(R.string.createContactSuccess),
                                             Toast.LENGTH_SHORT
                                         ).show()

@@ -1,12 +1,15 @@
 package com.app.phonebook.ui.home.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
-import com.app.phonebook.ui.createcontact.activity.CreateContact
+import com.app.phonebook.ui.contactdetail.activity.CreateContactDetailActivity
+import com.app.phonebook.ui.createcontact.activity.CreateContactActivity
 import com.app.phonebook.ui.home.item.PhoneBook
 import com.app.phonebook.ui.home.viewmodel.HomeViewModel
 import com.app.phonebook.ui.theme.PhoneBookTheme
@@ -34,9 +38,6 @@ class HomeActivity : ComponentActivity() {
 
     lateinit var phoneBook: MutableList<PhoneBook>
     var isShowProgress by mutableStateOf(true)
-
-    /*@Inject
-    lateinit var liveData: LiveData<PhoneBook>*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +81,14 @@ class HomeActivity : ComponentActivity() {
                             items(phoneBook.size) {
                                 Card(
                                     shape = RoundedCornerShape(4.dp),
-                                    modifier = lazyColumnModifier( it)
+                                    modifier = lazyColumnModifier(it).clickable {
+                                        startActivity(
+                                            Intent(
+                                                this@HomeActivity,
+                                                CreateContactDetailActivity::class.java
+                                            )
+                                        )
+                                    }
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(
@@ -129,9 +137,10 @@ class HomeActivity : ComponentActivity() {
                             icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                             text = { Text(resources.getString(R.string.create_contact)) },
                             onClick = {
-                                startActivity(
+                                resultLauncher.launch(
                                     Intent(
-                                        this@HomeActivity, CreateContact::class.java
+                                        this@HomeActivity,
+                                        CreateContactActivity::class.java
                                     )
                                 )
                             })
@@ -160,5 +169,14 @@ class HomeActivity : ComponentActivity() {
                 .wrapContentHeight()
         }
     }
+
+    var resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // There are no request codes
+                val data: Intent? = result.data
+            }
+        }
+
 
 }
