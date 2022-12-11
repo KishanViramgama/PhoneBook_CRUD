@@ -19,11 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
 import com.app.phonebook.ui.createcontact.viewmodel.CreateContactViewModel
 import com.app.phonebook.ui.home.item.PhoneBook
-import com.app.phonebook.ui.theme.PhoneBookTheme
+import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.util.Method
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -59,6 +60,9 @@ class CreateContactActivity : ComponentActivity() {
 
     @Inject
     lateinit var method: Method
+
+    @Inject
+    lateinit var mutableLiveData: MutableLiveData<PhoneBook>
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,7 +144,16 @@ class CreateContactActivity : ComponentActivity() {
                                                 null, name, surname, company, email, phone
                                             )
                                         )
-                                        setResult(RESULT_OK, Intent().putExtra("data", ""))
+                                        mutableLiveData.value=PhoneBook(
+                                            null, name, surname, company, email, phone
+                                        )
+                                        setResult(
+                                            RESULT_OK, Intent().putExtra(
+                                                "data", PhoneBook(
+                                                    null, name, surname, company, email, phone
+                                                )
+                                            )
+                                        )
                                         finish()
                                         Toast.makeText(
                                             this@CreateContactActivity,

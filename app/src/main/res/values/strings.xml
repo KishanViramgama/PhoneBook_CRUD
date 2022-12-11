@@ -22,4 +22,8 @@
 
     <string name="createContactSuccess">Create contact success fully</string>
 
+    <string name="call">Call</string>
+    <string name="sms">Sms</string>
+    <string name="video">Video</string>
+
 </resources>

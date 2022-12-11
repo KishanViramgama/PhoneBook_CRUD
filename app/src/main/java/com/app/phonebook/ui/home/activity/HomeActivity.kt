@@ -22,15 +22,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
+import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.ui.contactdetail.activity.CreateContactDetailActivity
 import com.app.phonebook.ui.createcontact.activity.CreateContactActivity
 import com.app.phonebook.ui.home.item.PhoneBook
 import com.app.phonebook.ui.home.viewmodel.HomeViewModel
-import com.app.phonebook.ui.theme.PhoneBookTheme
 import com.app.phonebook.util.Status
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
 
 @AndroidEntryPoint
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,10 +46,17 @@ class HomeActivity : ComponentActivity() {
     lateinit var phoneBook: MutableList<PhoneBook>
     var isShowProgress by mutableStateOf(true)
 
+    /*@Inject
+    lateinit var liveData: LiveData<PhoneBook>*/
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         phoneBook = ArrayList()
+
+        /*liveData.observe(this){
+            Log.d("data_information","Call data")
+        }*/
 
         val contactViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         contactViewModel.getData()
@@ -170,11 +184,22 @@ class HomeActivity : ComponentActivity() {
         }
     }
 
-    var resultLauncher =
+    private var resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // There are no request codes
-                val data: Intent? = result.data
+                try {
+                    val data: Intent? = result.data
+                    val getPhoneBook =
+                        data?.getSerializableExtra("data") as PhoneBook
+                    CoroutineScope(Dispatchers.IO).launch {
+                        phoneBook.add(getPhoneBook)
+                    }
+                    Log.d("data_information", phoneBook.size.toString())
+                } catch (e: Exception) {
+                    Log.d("data_information", e.toString())
+                }
+
             }
         }
 

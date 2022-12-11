@@ -28,7 +28,7 @@ class HomeViewModel @Inject constructor(
         freeDataSend.value = Resource.loading(null)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                freeDataSend.postValue(Resource.success(databaseClient.appDatabase.userTask()?.getData()))
+                freeDataSend.postValue(Resource.success(databaseClient.appDatabase.userTask()?.getAllContact()))
             } catch (e: Exception) {
                 freeDataSend.postValue(Resource.error(context.resources.getString(R.string.error), null))
             }

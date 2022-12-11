@@ -1,4 +1,4 @@
-package com.app.phonebook.ui.theme
+package com.app.phonebook.theme
 
 import android.app.Activity
 import android.os.Build

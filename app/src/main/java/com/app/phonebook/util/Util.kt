@@ -2,7 +2,10 @@ package com.app.phonebook.util
 
 import android.app.Application
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.app.phonebook.database.DatabaseClient
+import com.app.phonebook.ui.home.item.PhoneBook
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,17 +30,15 @@ class Util {
 
     @Provides
     @Singleton
-    fun provideMethod():Method{
+    fun provideMethod(): Method {
         return Method()
     }
 
-    /*@Provides
+    @Provides
     @Singleton
-    fun provideInsetData(): MutableLiveData<PhoneBook> = MutableLiveData()
+    fun provideMutableLiveData(): MutableLiveData<PhoneBook> = MutableLiveData()
 
     @Singleton
-    fun provideInsetData(mutableData: MutableLiveData<PhoneBook>): LiveData<PhoneBook> {
-        return mutableData
-    }*/
+    fun provideLiveData(mutableData: MutableLiveData<PhoneBook>): LiveData<PhoneBook> = mutableData
 
 }

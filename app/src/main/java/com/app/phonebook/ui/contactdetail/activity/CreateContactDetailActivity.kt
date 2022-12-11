@@ -3,19 +3,24 @@ package com.app.phonebook.ui.contactdetail.activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.cardview.widget.CardView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.phonebook.R
-import com.app.phonebook.ui.theme.PhoneBookTheme
+import com.app.phonebook.theme.PhoneBookTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 class CreateContactDetailActivity : ComponentActivity() {
@@ -30,9 +35,30 @@ class CreateContactDetailActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     Column {
-                        TopAppBar(
-                            title = { Text(text = resources.getString(R.string.home)) },
-                        )
+                        TopAppBar(title = { Text(text = resources.getString(R.string.home)) },
+                            Modifier.background(color = Color.Magenta),
+                            actions = {
+                                IconButton(onClick = {
+
+                                }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_outline_edit),
+                                        contentDescription = resources.getString(R.string.app_name),
+                                        modifier = Modifier
+                                            .height(24.dp)
+                                            .width(24.dp)
+                                    )
+                                }
+                                IconButton(onClick = { /*TODO*/ }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_outline_delete),
+                                        contentDescription = resources.getString(R.string.app_name),
+                                        modifier = Modifier
+                                            .height(24.dp)
+                                            .width(24.dp)
+                                    )
+                                }
+                            })
                         Box(
                             modifier = Modifier.align(CenterHorizontally),
                             contentAlignment = Alignment.Center
@@ -55,26 +81,20 @@ class CreateContactDetailActivity : ComponentActivity() {
                                 .fillMaxWidth()
                         )
                         Divider(modifier = Modifier.padding(top = 20.dp))
-                        Row(Modifier.height(100.dp)) {
-
-                        }
-                        Divider(modifier = Modifier.padding(top = 20.dp))
+                        View()
+                        Divider()
                         Card(
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(250.dp)
                                 .padding(
-                                    top = 25.dp,
-                                    start = 20.dp,
-                                    end = 20.dp,
-                                    bottom = 20.dp
+                                    top = 25.dp, start = 20.dp, end = 20.dp, bottom = 20.dp
                                 )
                         ) {
-                            Column(
-
-                            ) {
+                            Column() {
                                 Text(
+                                    textAlign = TextAlign.Center,
                                     text = "This is a card view",
                                 )
                             }
@@ -86,4 +106,56 @@ class CreateContactDetailActivity : ComponentActivity() {
         }
 
     }
+
+    @Composable
+    @Preview
+    fun View() {
+        Row {
+            common(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp)
+                    .weight(1f),
+                painter = painterResource(R.drawable.ic_outline_call),
+                title = resources.getString(R.string.call)
+            )
+            common(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp)
+                    .weight(1f),
+                painter = painterResource(R.drawable.ic_outline_sms),
+                title = resources.getString(R.string.sms)
+            )
+            common(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp)
+                    .weight(1f),
+                painter = painterResource(R.drawable.ic_outline_videocam),
+                title = resources.getString(R.string.video)
+            )
+        }
+    }
+
+    @Composable
+    fun common(modifier: Modifier, painter: Painter, title: String) {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painter,
+                contentDescription = title,
+                modifier = Modifier
+                    .height(32.dp)
+                    .width(32.dp)
+            )
+            Text(
+                text = title, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 10.dp)
+            )
+        }
+    }
+
 }
