@@ -144,15 +144,8 @@ class CreateContactActivity : ComponentActivity() {
                                                 null, name, surname, company, email, phone
                                             )
                                         )
-                                        mutableLiveData.value=PhoneBook(
+                                        mutableLiveData.value = PhoneBook(
                                             null, name, surname, company, email, phone
-                                        )
-                                        setResult(
-                                            RESULT_OK, Intent().putExtra(
-                                                "data", PhoneBook(
-                                                    null, name, surname, company, email, phone
-                                                )
-                                            )
                                         )
                                         finish()
                                         Toast.makeText(

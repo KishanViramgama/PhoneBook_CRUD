@@ -14,7 +14,7 @@
         android:theme="@style/Theme.PhoneBook"
         tools:targetApi="31">
         <activity
-            android:name=".ui.contactdetail.activity.CreateContactDetailActivity"
+            android:name=".ui.contactdetail.activity.ContactDetailActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

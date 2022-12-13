@@ -1,13 +1,11 @@
 package com.app.phonebook.ui.home.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,19 +21,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
 import com.app.phonebook.theme.PhoneBookTheme
-import com.app.phonebook.ui.contactdetail.activity.CreateContactDetailActivity
+import com.app.phonebook.ui.contactdetail.activity.ContactDetailActivity
 import com.app.phonebook.ui.createcontact.activity.CreateContactActivity
 import com.app.phonebook.ui.home.item.PhoneBook
 import com.app.phonebook.ui.home.viewmodel.HomeViewModel
 import com.app.phonebook.util.Status
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -43,20 +37,19 @@ import javax.inject.Inject
 @OptIn(ExperimentalMaterial3Api::class)
 class HomeActivity : ComponentActivity() {
 
-    lateinit var phoneBook: MutableList<PhoneBook>
+    var phoneBook = mutableStateListOf<PhoneBook>()
     var isShowProgress by mutableStateOf(true)
 
-    /*@Inject
-    lateinit var liveData: LiveData<PhoneBook>*/
+    @Inject
+    lateinit var liveData: LiveData<PhoneBook>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        phoneBook = ArrayList()
-
-        /*liveData.observe(this){
-            Log.d("data_information","Call data")
-        }*/
+        liveData.observe(this) {
+            phoneBook.add(it)
+            Log.d("data_information", "Call live data")
+        }
 
         val contactViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         contactViewModel.getData()
@@ -93,17 +86,15 @@ class HomeActivity : ComponentActivity() {
                         )
                         LazyColumn() {
                             items(phoneBook.size) {
-                                Card(
-                                    shape = RoundedCornerShape(4.dp),
+                                Card(shape = RoundedCornerShape(4.dp),
                                     modifier = lazyColumnModifier(it).clickable {
                                         startActivity(
                                             Intent(
                                                 this@HomeActivity,
-                                                CreateContactDetailActivity::class.java
+                                                ContactDetailActivity::class.java
                                             )
                                         )
-                                    }
-                                ) {
+                                    }) {
                                     Row(
                                         modifier = Modifier.padding(
                                             start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp
@@ -123,9 +114,11 @@ class HomeActivity : ComponentActivity() {
                                             )
                                         }
                                         Text(
-                                            text = phoneBook[it].name, modifier = Modifier.padding(
+                                            text = phoneBook[it]!!.name,
+                                            modifier = Modifier.padding(
                                                 start = 10.dp, end = 10.dp
-                                            ), textAlign = TextAlign.Center
+                                            ),
+                                            textAlign = TextAlign.Center
                                         )
                                     }
                                 }
@@ -151,10 +144,9 @@ class HomeActivity : ComponentActivity() {
                             icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                             text = { Text(resources.getString(R.string.create_contact)) },
                             onClick = {
-                                resultLauncher.launch(
+                                startActivity(
                                     Intent(
-                                        this@HomeActivity,
-                                        CreateContactActivity::class.java
+                                        this@HomeActivity, CreateContactActivity::class.java
                                     )
                                 )
                             })
@@ -183,25 +175,5 @@ class HomeActivity : ComponentActivity() {
                 .wrapContentHeight()
         }
     }
-
-    private var resultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // There are no request codes
-                try {
-                    val data: Intent? = result.data
-                    val getPhoneBook =
-                        data?.getSerializableExtra("data") as PhoneBook
-                    CoroutineScope(Dispatchers.IO).launch {
-                        phoneBook.add(getPhoneBook)
-                    }
-                    Log.d("data_information", phoneBook.size.toString())
-                } catch (e: Exception) {
-                    Log.d("data_information", e.toString())
-                }
-
-            }
-        }
-
 
 }

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -19,14 +20,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
 import com.app.phonebook.theme.PhoneBookTheme
+import com.app.phonebook.ui.contactdetail.viewmodel.CDViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-class CreateContactDetailActivity : ComponentActivity() {
+class ContactDetailActivity : ComponentActivity() {
+
+    lateinit var ccdViewModel: CDViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        ccdViewModel = ViewModelProvider(this)[CDViewModel::class.java]
 
         setContent {
             PhoneBookTheme {
@@ -115,7 +122,10 @@ class CreateContactDetailActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp, bottom = 20.dp)
-                    .weight(1f),
+                    .weight(1f)
+                    .clickable {
+                        ccdViewModel.callPhone("")
+                    },
                 painter = painterResource(R.drawable.ic_outline_call),
                 title = resources.getString(R.string.call)
             )
@@ -123,7 +133,7 @@ class CreateContactDetailActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp, bottom = 20.dp)
-                    .weight(1f),
+                    .weight(1f).clickable {  },
                 painter = painterResource(R.drawable.ic_outline_sms),
                 title = resources.getString(R.string.sms)
             )
@@ -131,7 +141,7 @@ class CreateContactDetailActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp, bottom = 20.dp)
-                    .weight(1f),
+                    .weight(1f).clickable {  },
                 painter = painterResource(R.drawable.ic_outline_videocam),
                 title = resources.getString(R.string.video)
             )
