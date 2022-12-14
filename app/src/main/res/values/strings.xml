@@ -5,6 +5,7 @@
     <string name="create_contact">Create contact</string>
 
     <string name="error">Some thing went to wrong</string>
+    <string name="contactNotCreate">Contact not create</string>
 
     <string name="submit">Submit</string>
 

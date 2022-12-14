@@ -53,7 +53,7 @@ class HomeActivity : ComponentActivity() {
 
         val contactViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         contactViewModel.getData()
-        contactViewModel.freeDataSendObservable.observe(this@HomeActivity) {
+        contactViewModel.getDataPhoneBook.observe(this@HomeActivity) {
             when (it.status) {
                 Status.SUCCESS -> {
                     if (it.data != null) {
@@ -92,7 +92,7 @@ class HomeActivity : ComponentActivity() {
                                             Intent(
                                                 this@HomeActivity,
                                                 ContactDetailActivity::class.java
-                                            )
+                                            ).putExtra("id",phoneBook[it].id)
                                         )
                                     }) {
                                     Row(
@@ -147,7 +147,7 @@ class HomeActivity : ComponentActivity() {
                                 startActivity(
                                     Intent(
                                         this@HomeActivity, CreateContactActivity::class.java
-                                    )
+                                    ).putExtra("type","create")
                                 )
                             })
                     }

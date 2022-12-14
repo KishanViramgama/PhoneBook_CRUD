@@ -1,6 +1,8 @@
 package com.app.phonebook.ui.contactdetail.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -11,6 +13,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -24,29 +29,58 @@ import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
 import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.ui.contactdetail.viewmodel.CDViewModel
+import com.app.phonebook.ui.createcontact.activity.CreateContactActivity
+import com.app.phonebook.util.Status
+import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
+@AndroidEntryPoint
 class ContactDetailActivity : ComponentActivity() {
 
-    lateinit var ccdViewModel: CDViewModel
+    private lateinit var id: String
+    private var name by mutableStateOf("")
+    private lateinit var ccdViewModel: CDViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        id = intent.getIntExtra("id", 0).toString()
+
         ccdViewModel = ViewModelProvider(this)[CDViewModel::class.java]
+        ccdViewModel.getSingleContact(id)
+        ccdViewModel.getSingleContact.observe(this) {
+            when (it.status) {
+                Status.SUCCESS -> {
+                    name = it.data?.name.toString()
+                }
+                Status.LOADING -> {
+                }
+                Status.ERROR -> {
+                    Toast.makeText(
+                        this, it.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
         setContent {
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     Column {
                         TopAppBar(title = { Text(text = resources.getString(R.string.home)) },
                             Modifier.background(color = Color.Magenta),
                             actions = {
                                 IconButton(onClick = {
-
+                                    startActivity(
+                                        Intent(
+                                            this@ContactDetailActivity,
+                                            CreateContactActivity::class.java
+                                        ).putExtra("type", "edit").putExtra("id", id)
+                                    )
                                 }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_outline_edit),
@@ -81,7 +115,7 @@ class ContactDetailActivity : ComponentActivity() {
                             )
                         }
                         Text(
-                            text = "Kishan Viramgama",
+                            text = name,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .padding(top = 40.dp, start = 10.dp, end = 10.dp)
@@ -133,7 +167,8 @@ class ContactDetailActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp, bottom = 20.dp)
-                    .weight(1f).clickable {  },
+                    .weight(1f)
+                    .clickable { },
                 painter = painterResource(R.drawable.ic_outline_sms),
                 title = resources.getString(R.string.sms)
             )
@@ -141,7 +176,8 @@ class ContactDetailActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp, bottom = 20.dp)
-                    .weight(1f).clickable {  },
+                    .weight(1f)
+                    .clickable { },
                 painter = painterResource(R.drawable.ic_outline_videocam),
                 title = resources.getString(R.string.video)
             )
@@ -163,7 +199,9 @@ class ContactDetailActivity : ComponentActivity() {
                     .width(32.dp)
             )
             Text(
-                text = title, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 10.dp)
+                text = title,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 10.dp)
             )
         }
     }

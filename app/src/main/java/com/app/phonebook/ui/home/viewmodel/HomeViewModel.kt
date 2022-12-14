@@ -21,16 +21,26 @@ class HomeViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val freeDataSend: MutableLiveData<Resource<MutableList<PhoneBook>>> = MutableLiveData()
-    val freeDataSendObservable: LiveData<Resource<MutableList<PhoneBook>>> = freeDataSend
+    private val liveDataPhoneBook: MutableLiveData<Resource<MutableList<PhoneBook>>> =
+        MutableLiveData()
+    val getDataPhoneBook: LiveData<Resource<MutableList<PhoneBook>>> = liveDataPhoneBook
 
     fun getData() {
-        freeDataSend.value = Resource.loading(null)
+        liveDataPhoneBook.value = Resource.loading(null)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                freeDataSend.postValue(Resource.success(databaseClient.appDatabase.userTask()?.getAllContact()))
+                liveDataPhoneBook.postValue(
+                    Resource.success(
+                        databaseClient.appDatabase.userTask()?.getAllContact()
+                    )
+                )
             } catch (e: Exception) {
-                freeDataSend.postValue(Resource.error(context.resources.getString(R.string.error), null))
+                liveDataPhoneBook.postValue(
+                    Resource.error(
+                        context.resources.getString(R.string.error),
+                        null
+                    )
+                )
             }
         }
     }

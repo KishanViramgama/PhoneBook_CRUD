@@ -1,6 +1,5 @@
 package com.app.phonebook.ui.createcontact.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -22,16 +21,27 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
+import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.ui.createcontact.viewmodel.CreateContactViewModel
 import com.app.phonebook.ui.home.item.PhoneBook
-import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.util.Method
+import com.app.phonebook.util.Status
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class CreateContactActivity : ComponentActivity() {
+
+    private lateinit var type: String
+    private lateinit var id: String
+    private lateinit var createContactViewModel: CreateContactViewModel
+
+    @Inject
+    lateinit var method: Method
+
+    @Inject
+    lateinit var mutableLiveData: MutableLiveData<PhoneBook>
 
     //Name
     private var name by mutableStateOf("")
@@ -58,17 +68,57 @@ class CreateContactActivity : ComponentActivity() {
     private var phoneErrorState by mutableStateOf(false)
     private val phoneFocusRequester = FocusRequester()
 
-    @Inject
-    lateinit var method: Method
-
-    @Inject
-    lateinit var mutableLiveData: MutableLiveData<PhoneBook>
-
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val createContactViewModel = ViewModelProvider(this)[CreateContactViewModel::class.java]
+        createContactViewModel = ViewModelProvider(this)[CreateContactViewModel::class.java]
+
+        type = intent.getStringExtra("type").toString()
+        if (type == "edit") {
+            id = intent.getStringExtra("id").toString()
+            createContactViewModel.getSingleContact(id)
+        }
+
+        createContactViewModel.phoneBookObservable.observe(this) {
+            when (it.status) {
+                Status.SUCCESS -> {
+                    mutableLiveData.value = it.data
+                    finish()
+                    Toast.makeText(
+                        this@CreateContactActivity,
+                        resources.getString(R.string.createContactSuccess),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                Status.LOADING -> {
+                }
+                Status.ERROR -> {
+                    Toast.makeText(
+                        this, it.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        createContactViewModel.getSingleContact.observe(this) {
+            when (it.status) {
+                Status.SUCCESS -> {
+                    name = it.data?.name.toString()
+                    surname = it.data?.surname.toString()
+                    company = it.data?.company.toString()
+                    email = it.data?.email.toString()
+                    phone = it.data?.phone.toString()
+                }
+                Status.LOADING -> {
+                }
+                Status.ERROR -> {
+                    Toast.makeText(
+                        this, it.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
         setContent {
             PhoneBookTheme {
@@ -144,15 +194,6 @@ class CreateContactActivity : ComponentActivity() {
                                                 null, name, surname, company, email, phone
                                             )
                                         )
-                                        mutableLiveData.value = PhoneBook(
-                                            null, name, surname, company, email, phone
-                                        )
-                                        finish()
-                                        Toast.makeText(
-                                            this@CreateContactActivity,
-                                            resources.getString(R.string.createContactSuccess),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
                                     }
 
                                 },
@@ -185,7 +226,7 @@ class CreateContactActivity : ComponentActivity() {
         onTextChanged: (String) -> Unit
     ) {
 
-        var name by remember { mutableStateOf(textName) }
+        var name by  mutableStateOf(textName)
 
         OutlinedTextField(
             value = name,
