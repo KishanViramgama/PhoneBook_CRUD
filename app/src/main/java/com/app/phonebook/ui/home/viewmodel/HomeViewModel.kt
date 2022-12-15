@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.app.phonebook.R
-import com.app.phonebook.database.DatabaseClient
+import com.app.phonebook.ui.home.repository.HomeRepository
 import com.app.phonebook.ui.home.item.PhoneBook
 import com.app.phonebook.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val context: Context,
-    private val databaseClient: DatabaseClient
+    private val homeRepository: HomeRepository
 ) :
     ViewModel() {
 
@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(
             try {
                 liveDataPhoneBook.postValue(
                     Resource.success(
-                        databaseClient.appDatabase.userTask()?.getAllContact()
+                        homeRepository.getUserContact()
                     )
                 )
             } catch (e: Exception) {

@@ -10,14 +10,15 @@ interface DataEntity {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertData(phoneBook: PhoneBook): Long
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateUserContact(phoneBook: PhoneBook): Int
+
     @Query("SELECT * FROM PhoneBook")
     fun getAllContact(): MutableList<PhoneBook>
 
-    // get single transaction by id
     @Query("SELECT * FROM PhoneBook WHERE id = :id")
     fun getSingleContact(id: String): PhoneBook
 
-    // delete transaction by id
     @Query("DELETE FROM PhoneBook WHERE id = :id")
     suspend fun deleteContactById(id: Int)
 

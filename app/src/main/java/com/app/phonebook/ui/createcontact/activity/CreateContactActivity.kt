@@ -22,7 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
 import com.app.phonebook.theme.PhoneBookTheme
-import com.app.phonebook.ui.createcontact.viewmodel.CreateContactViewModel
+import com.app.phonebook.ui.createcontact.viewmodel.CCViewModel
 import com.app.phonebook.ui.home.item.PhoneBook
 import com.app.phonebook.util.Method
 import com.app.phonebook.util.Status
@@ -35,7 +35,7 @@ class CreateContactActivity : ComponentActivity() {
 
     private lateinit var type: String
     private lateinit var id: String
-    private lateinit var createContactViewModel: CreateContactViewModel
+    private lateinit var createContactViewModel: CCViewModel
 
     @Inject
     lateinit var method: Method
@@ -72,7 +72,7 @@ class CreateContactActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        createContactViewModel = ViewModelProvider(this)[CreateContactViewModel::class.java]
+        createContactViewModel = ViewModelProvider(this)[CCViewModel::class.java]
 
         type = intent.getStringExtra("type").toString()
         if (type == "edit") {
@@ -80,7 +80,28 @@ class CreateContactActivity : ComponentActivity() {
             createContactViewModel.getSingleContact(id)
         }
 
-        createContactViewModel.phoneBookObservable.observe(this) {
+        createContactViewModel.insertContactObservable.observe(this) {
+            when (it.status) {
+                Status.SUCCESS -> {
+                    mutableLiveData.value = it.data
+                    finish()
+                    Toast.makeText(
+                        this@CreateContactActivity,
+                        resources.getString(R.string.createContactSuccess),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                Status.LOADING -> {
+                }
+                Status.ERROR -> {
+                    Toast.makeText(
+                        this, it.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        createContactViewModel.userContactUpdateObservable.observe(this){
             when (it.status) {
                 Status.SUCCESS -> {
                     mutableLiveData.value = it.data
@@ -189,11 +210,19 @@ class CreateContactActivity : ComponentActivity() {
                                     } else if (phone == "") {
                                         phoneErrorState = true
                                     } else {
-                                        createContactViewModel.insertData(
-                                            PhoneBook(
-                                                null, name, surname, company, email, phone
+                                        if (type == "create") {
+                                            createContactViewModel.insertData(
+                                                PhoneBook(
+                                                    null, name, surname, company, email, phone
+                                                )
                                             )
-                                        )
+                                        } else {
+                                            createContactViewModel.updateUserContact(
+                                                PhoneBook(
+                                                    id.toInt(), name, surname, company, email, phone
+                                                )
+                                            )
+                                        }
                                     }
 
                                 },
@@ -226,7 +255,7 @@ class CreateContactActivity : ComponentActivity() {
         onTextChanged: (String) -> Unit
     ) {
 
-        var name by  mutableStateOf(textName)
+        var name by mutableStateOf(textName)
 
         OutlinedTextField(
             value = name,

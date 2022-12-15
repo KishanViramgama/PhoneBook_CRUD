@@ -1,12 +1,11 @@
 package com.app.phonebook.ui.createcontact.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.app.phonebook.R
-import com.app.phonebook.database.DatabaseClient
+import com.app.phonebook.ui.createcontact.repository.CCRepository
 import com.app.phonebook.ui.home.item.PhoneBook
 import com.app.phonebook.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,15 +15,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateContactViewModel @Inject constructor(
-    private val context: Context
+class CCViewModel @Inject constructor(
+    private val context: Context, private val ccRepository: CCRepository
 ) : ViewModel() {
 
-    @Inject
-    lateinit var database: DatabaseClient
+    private val insertContactLiveData: MutableLiveData<Resource<PhoneBook>> = MutableLiveData()
+    val insertContactObservable: LiveData<Resource<PhoneBook>> = insertContactLiveData
 
-    private val phoneBookLiveData: MutableLiveData<Resource<PhoneBook>> = MutableLiveData()
-    val phoneBookObservable: LiveData<Resource<PhoneBook>> = phoneBookLiveData
+    private val userContactUpdateLiveData: MutableLiveData<Resource<PhoneBook>> = MutableLiveData()
+    val userContactUpdateObservable: LiveData<Resource<PhoneBook>> = userContactUpdateLiveData
 
     private val singleContactLiveData: MutableLiveData<Resource<PhoneBook>> = MutableLiveData()
     val getSingleContact: LiveData<Resource<PhoneBook>> = singleContactLiveData
@@ -32,10 +31,9 @@ class CreateContactViewModel @Inject constructor(
     fun insertData(phoneBook: PhoneBook) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val id: Int =
-                    database.appDatabase.userTask()?.insertData(phoneBook)!!.toInt()
+                val id: Int = ccRepository.insertUserContact(phoneBook)
                 if (id > 0) {
-                    phoneBookLiveData.postValue(
+                    insertContactLiveData.postValue(
                         Resource.success(
                             PhoneBook(
                                 id,
@@ -48,14 +46,14 @@ class CreateContactViewModel @Inject constructor(
                         )
                     )
                 } else {
-                    phoneBookLiveData.postValue(
+                    insertContactLiveData.postValue(
                         Resource.error(
                             context.getString(R.string.contactNotCreate), null
                         )
                     )
                 }
             } catch (e: Exception) {
-                phoneBookLiveData.postValue(
+                insertContactLiveData.postValue(
                     Resource.error(
                         context.resources.getString(R.string.error), null
                     )
@@ -64,11 +62,43 @@ class CreateContactViewModel @Inject constructor(
         }
     }
 
-    fun getSingleContact(id:String) {
+    fun updateUserContact(phoneBook: PhoneBook){
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val phoneBook: PhoneBook = database.appDatabase.userTask()!!.getSingleContact(id)
-                singleContactLiveData.postValue(Resource.success(phoneBook))
+                val id: Int = ccRepository.updateUserContact(phoneBook)
+                if (id > 0) {
+                    userContactUpdateLiveData.postValue(
+                        Resource.success(
+                            phoneBook
+                        )
+                    )
+                } else {
+                    userContactUpdateLiveData.postValue(
+                        Resource.error(
+                            context.getString(R.string.contactNotCreate), null
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                userContactUpdateLiveData.postValue(
+                    Resource.error(
+                        context.resources.getString(R.string.error), null
+                    )
+                )
+            }
+        }
+    }
+
+    fun getSingleContact(id: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                singleContactLiveData.postValue(
+                    Resource.success(
+                        ccRepository.getSingleUserContact(
+                            id
+                        )
+                    )
+                )
             } catch (e: Exception) {
                 singleContactLiveData.postValue(
                     Resource.error(

@@ -90,7 +90,7 @@ class ContactDetailActivity : ComponentActivity() {
                                             .width(24.dp)
                                     )
                                 }
-                                IconButton(onClick = { /*TODO*/ }) {
+                                IconButton(onClick = {  }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_outline_delete),
                                         contentDescription = resources.getString(R.string.app_name),
