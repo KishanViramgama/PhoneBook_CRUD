@@ -24,8 +24,10 @@ import com.app.phonebook.R
 import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.ui.createcontact.viewmodel.CCViewModel
 import com.app.phonebook.ui.home.item.PhoneBook
+import com.app.phonebook.util.LiveDataType
 import com.app.phonebook.util.Method
 import com.app.phonebook.util.Status
+import com.app.phonebook.util.Type
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,6 +36,7 @@ import javax.inject.Inject
 class CreateContactActivity : ComponentActivity() {
 
     private lateinit var type: String
+    private var position: Int = 0
     private lateinit var id: String
     private lateinit var createContactViewModel: CCViewModel
 
@@ -41,7 +44,7 @@ class CreateContactActivity : ComponentActivity() {
     lateinit var method: Method
 
     @Inject
-    lateinit var mutableLiveData: MutableLiveData<PhoneBook>
+    lateinit var mutableLiveData: MutableLiveData<LiveDataType<PhoneBook>>
 
     //Name
     private var name by mutableStateOf("")
@@ -75,6 +78,7 @@ class CreateContactActivity : ComponentActivity() {
         createContactViewModel = ViewModelProvider(this)[CCViewModel::class.java]
 
         type = intent.getStringExtra("type").toString()
+        position = intent.getIntExtra("position", 0)
         if (type == "edit") {
             id = intent.getStringExtra("id").toString()
             createContactViewModel.getSingleContact(id)
@@ -83,7 +87,8 @@ class CreateContactActivity : ComponentActivity() {
         createContactViewModel.insertContactObservable.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
-                    mutableLiveData.value = it.data
+                    mutableLiveData.value =
+                        LiveDataType.callObserver(it.data, position, Type.INSERT)
                     finish()
                     Toast.makeText(
                         this@CreateContactActivity,
@@ -101,10 +106,11 @@ class CreateContactActivity : ComponentActivity() {
             }
         }
 
-        createContactViewModel.userContactUpdateObservable.observe(this){
+        createContactViewModel.userContactUpdateObservable.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
-                    mutableLiveData.value = it.data
+                    mutableLiveData.value =
+                        LiveDataType.callObserver(it.data, position, Type.UPDATE)
                     finish()
                     Toast.makeText(
                         this@CreateContactActivity,
@@ -145,7 +151,9 @@ class CreateContactActivity : ComponentActivity() {
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     Column(
                         modifier = Modifier

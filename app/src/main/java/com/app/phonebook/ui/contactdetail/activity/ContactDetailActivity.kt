@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -25,26 +22,40 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
 import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.ui.contactdetail.viewmodel.CDViewModel
 import com.app.phonebook.ui.createcontact.activity.CreateContactActivity
+import com.app.phonebook.ui.home.item.PhoneBook
+import com.app.phonebook.util.LiveDataType
+import com.app.phonebook.util.Method
 import com.app.phonebook.util.Status
+import com.app.phonebook.util.Type
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class ContactDetailActivity : ComponentActivity() {
 
     private lateinit var id: String
+    private var position: Int = 0
     private var name by mutableStateOf("")
     private lateinit var ccdViewModel: CDViewModel
+
+    @Inject
+    lateinit var method: Method
+
+    @Inject
+    lateinit var mutableLiveData: MutableLiveData<LiveDataType<PhoneBook>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         id = intent.getIntExtra("id", 0).toString()
+        position = intent.getIntExtra("position", 0)
 
         ccdViewModel = ViewModelProvider(this)[CDViewModel::class.java]
         ccdViewModel.getSingleContact(id)
@@ -70,7 +81,10 @@ class ContactDetailActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column {
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                    ) {
                         TopAppBar(title = { Text(text = resources.getString(R.string.home)) },
                             Modifier.background(color = Color.Magenta),
                             actions = {
@@ -80,6 +94,7 @@ class ContactDetailActivity : ComponentActivity() {
                                             this@ContactDetailActivity,
                                             CreateContactActivity::class.java
                                         ).putExtra("type", "edit").putExtra("id", id)
+                                            .putExtra("position", position)
                                     )
                                 }) {
                                     Icon(
@@ -90,7 +105,12 @@ class ContactDetailActivity : ComponentActivity() {
                                             .width(24.dp)
                                     )
                                 }
-                                IconButton(onClick = {  }) {
+                                IconButton(onClick = {
+                                    mutableLiveData.value =
+                                        LiveDataType.callObserver(null, position, Type.DELETE)
+                                    finish()
+                                    //method.Dialog()
+                                }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_outline_delete),
                                         contentDescription = resources.getString(R.string.app_name),

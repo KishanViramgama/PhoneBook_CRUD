@@ -28,7 +28,9 @@ import com.app.phonebook.ui.contactdetail.activity.ContactDetailActivity
 import com.app.phonebook.ui.createcontact.activity.CreateContactActivity
 import com.app.phonebook.ui.home.item.PhoneBook
 import com.app.phonebook.ui.home.viewmodel.HomeViewModel
+import com.app.phonebook.util.LiveDataType
 import com.app.phonebook.util.Status
+import com.app.phonebook.util.Type
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -41,13 +43,24 @@ class HomeActivity : ComponentActivity() {
     var isShowProgress by mutableStateOf(true)
 
     @Inject
-    lateinit var liveData: LiveData<PhoneBook>
+    lateinit var liveData: LiveData<LiveDataType<PhoneBook>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         liveData.observe(this) {
-            phoneBook.add(it)
+            when (it.type) {
+                Type.INSERT -> {
+                    phoneBook.add(0, it.data!!)
+                }
+                Type.UPDATE -> {
+                    phoneBook.removeAt(it.position)
+                    phoneBook.add(it.position, it.data!!)
+                }
+                Type.DELETE -> {
+                    phoneBook.removeAt(it.position)
+                }
+            }
             Log.d("data_information", "Call live data")
         }
 
@@ -92,7 +105,8 @@ class HomeActivity : ComponentActivity() {
                                             Intent(
                                                 this@HomeActivity,
                                                 ContactDetailActivity::class.java
-                                            ).putExtra("id",phoneBook[it].id)
+                                            ).putExtra("id", phoneBook[it].id)
+                                                .putExtra("position", it)
                                         )
                                     }) {
                                     Row(
@@ -114,7 +128,7 @@ class HomeActivity : ComponentActivity() {
                                             )
                                         }
                                         Text(
-                                            text = phoneBook[it]!!.name,
+                                            text = phoneBook[it].name,
                                             modifier = Modifier.padding(
                                                 start = 10.dp, end = 10.dp
                                             ),
@@ -147,7 +161,7 @@ class HomeActivity : ComponentActivity() {
                                 startActivity(
                                     Intent(
                                         this@HomeActivity, CreateContactActivity::class.java
-                                    ).putExtra("type","create")
+                                    ).putExtra("type", "create").putExtra("position", 0)
                                 )
                             })
                     }

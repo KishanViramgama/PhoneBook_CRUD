@@ -36,10 +36,10 @@ class Util {
 
     @Provides
     @Singleton
-    fun provideMutableLiveData(): MutableLiveData<PhoneBook> = MutableLiveData()
+    fun provideMutableLiveData(): MutableLiveData<LiveDataType<PhoneBook>> = MutableLiveData<LiveDataType<PhoneBook>>()
 
     @Provides
     @Singleton
-    fun provideLiveData(mutableData: MutableLiveData<PhoneBook>): LiveData<PhoneBook> = mutableData
+    fun provideLiveData(mutableData: MutableLiveData<LiveDataType<PhoneBook>>): LiveData<LiveDataType<PhoneBook>> = mutableData
 
 }
