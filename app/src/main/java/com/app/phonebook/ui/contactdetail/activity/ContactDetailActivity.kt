@@ -8,11 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -22,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
@@ -42,7 +42,7 @@ class ContactDetailActivity : ComponentActivity() {
 
     private lateinit var id: String
     private var position: Int = 0
-    private var name by mutableStateOf("")
+    private var phoneBook: PhoneBook?= null
     private lateinit var ccdViewModel: CDViewModel
 
     @Inject
@@ -62,7 +62,7 @@ class ContactDetailActivity : ComponentActivity() {
         ccdViewModel.getSingleContact.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
-                    name = it.data?.name.toString()
+                    phoneBook = it.data!!
                 }
                 Status.LOADING -> {
                 }
@@ -85,8 +85,16 @@ class ContactDetailActivity : ComponentActivity() {
                         modifier = Modifier
                             .verticalScroll(rememberScrollState())
                     ) {
-                        TopAppBar(title = { Text(text = resources.getString(R.string.home)) },
+                        TopAppBar(title = { Text(text = resources.getString(R.string.contact_detail)) },
                             Modifier.background(color = Color.Magenta),
+                            navigationIcon = {
+                                IconButton(onClick = { finish() }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.ArrowBack,
+                                        contentDescription = resources.getString(R.string.app_name)
+                                    )
+                                }
+                            },
                             actions = {
                                 IconButton(onClick = {
                                     startActivity(
@@ -134,13 +142,15 @@ class ContactDetailActivity : ComponentActivity() {
                                 text = "K", textAlign = TextAlign.Center
                             )
                         }
-                        Text(
-                            text = name,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(top = 40.dp, start = 10.dp, end = 10.dp)
-                                .fillMaxWidth()
-                        )
+                        phoneBook?.let {
+                            Text(
+                                text = it.name,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .padding(top = 40.dp, start = 10.dp, end = 10.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
                         Divider(modifier = Modifier.padding(top = 20.dp))
                         View()
                         Divider()
@@ -155,9 +165,42 @@ class ContactDetailActivity : ComponentActivity() {
                         ) {
                             Column() {
                                 Text(
-                                    textAlign = TextAlign.Center,
-                                    text = "This is a card view",
+                                    text = resources.getString(R.string.contact_info),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 10.dp, start = 10.dp)
                                 )
+                                /*Text(
+                                    text = getData(phoneBook.name),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 5.dp, start = 10.dp)
+                                )
+                                Text(
+                                    text = getData(phoneBook.surname),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 5.dp, start = 10.dp)
+                                )
+                                Text(
+                                    text = getData(phoneBook.company),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 5.dp, start = 10.dp)
+                                )
+                                Text(
+                                    text = getData(phoneBook.email),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 5.dp, start = 10.dp)
+                                )
+                                Text(
+                                    text = getData(phoneBook.phone),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 5.dp, start = 10.dp)
+                                )*/
                             }
                         }
                     }
@@ -166,6 +209,10 @@ class ContactDetailActivity : ComponentActivity() {
             }
         }
 
+    }
+
+    fun getData(string: String?): String {
+        return string ?: ""
     }
 
     @Composable
@@ -180,7 +227,7 @@ class ContactDetailActivity : ComponentActivity() {
                     .clickable {
                         ccdViewModel.callPhone("")
                     },
-                painter = painterResource(R.drawable.ic_outline_call),
+                painter = painterResource(id = R.drawable.ic_outline_call),
                 title = resources.getString(R.string.call)
             )
             common(
@@ -189,7 +236,7 @@ class ContactDetailActivity : ComponentActivity() {
                     .padding(top = 20.dp, bottom = 20.dp)
                     .weight(1f)
                     .clickable { },
-                painter = painterResource(R.drawable.ic_outline_sms),
+                painter = painterResource(id = R.drawable.ic_outline_sms),
                 title = resources.getString(R.string.sms)
             )
             common(
@@ -198,7 +245,7 @@ class ContactDetailActivity : ComponentActivity() {
                     .padding(top = 20.dp, bottom = 20.dp)
                     .weight(1f)
                     .clickable { },
-                painter = painterResource(R.drawable.ic_outline_videocam),
+                painter = painterResource(id = R.drawable.ic_outline_videocam),
                 title = resources.getString(R.string.video)
             )
         }

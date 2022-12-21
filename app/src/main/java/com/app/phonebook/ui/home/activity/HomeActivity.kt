@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,7 +41,7 @@ import javax.inject.Inject
 class HomeActivity : ComponentActivity() {
 
     var phoneBook = mutableStateListOf<PhoneBook>()
-    var isShowProgress by mutableStateOf(true)
+    private var isShowProgress by mutableStateOf(true)
 
     @Inject
     lateinit var liveData: LiveData<LiveDataType<PhoneBook>>
@@ -96,6 +97,7 @@ class HomeActivity : ComponentActivity() {
                     Column {
                         TopAppBar(
                             title = { Text(text = resources.getString(R.string.home)) },
+                            colors = TopAppBarDefaults.topAppBarColors(containerColor = com.app.phonebook.theme.Purple80)
                         )
                         LazyColumn() {
                             items(phoneBook.size) {
@@ -129,10 +131,12 @@ class HomeActivity : ComponentActivity() {
                                         }
                                         Text(
                                             text = phoneBook[it].name,
-                                            modifier = Modifier.padding(
-                                                start = 10.dp, end = 10.dp
-                                            ),
-                                            textAlign = TextAlign.Center
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 10.dp, end = 10.dp
+                                                )
+                                                .align(Alignment.CenterVertically)
+                                                .fillMaxWidth(),
                                         )
                                     }
                                 }

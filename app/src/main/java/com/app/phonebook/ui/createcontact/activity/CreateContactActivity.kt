@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -152,96 +154,100 @@ class CreateContactActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 20.dp, end = 20.dp)
-                    ) {
+                    Column {
                         TopAppBar(
                             title = { Text(text = resources.getString(R.string.create_contact)) },
+                            navigationIcon = {
+                                IconButton(onClick = { finish() }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.ArrowBack,
+                                        contentDescription = resources.getString(R.string.app_name)
+                                    )
+                                }
+                            },
                         )
-                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                            editText(name,
-                                resources.getString(R.string.name),
-                                resources.getString(R.string.please_enter_name),
-                                nameErrorState,
-                                nameFocusRequester,
-                                KeyboardOptions(keyboardType = KeyboardType.Text),
-                                onTextChanged = { name = it })
-                            editText(surname,
-                                resources.getString(R.string.sureName),
-                                resources.getString(R.string.please_enter_sureName),
-                                surnameErrorState,
-                                surnameFocusRequester,
-                                KeyboardOptions(keyboardType = KeyboardType.Text),
-                                onTextChanged = { surname = it })
-                            editText(company,
-                                resources.getString(R.string.company),
-                                resources.getString(R.string.please_enter_company),
-                                companyErrorState,
-                                companyFocusRequester,
-                                KeyboardOptions(keyboardType = KeyboardType.Text),
-                                onTextChanged = { company = it })
-                            editText(email,
-                                resources.getString(R.string.email),
-                                resources.getString(R.string.please_enter_email),
-                                emailErrorState,
-                                emailFocusRequester,
-                                KeyboardOptions(keyboardType = KeyboardType.Email),
-                                onTextChanged = { email = it })
-                            editText(phone,
-                                resources.getString(R.string.phoneNo),
-                                resources.getString(R.string.please_enter_phoneNo),
-                                phoneErrorState,
-                                phoneFocusRequester,
-                                KeyboardOptions(keyboardType = KeyboardType.Phone),
-                                onTextChanged = { phone = it })
-                            ElevatedButton(
-                                onClick = {
-                                    nameErrorState = false
-                                    surnameErrorState = false
-                                    companyErrorState = false
-                                    emailErrorState = false
-                                    phoneErrorState = false
-                                    if (name == "") {
-                                        nameErrorState = true
-                                    } else if (surname == "") {
-                                        surnameErrorState = true
-                                    } else if (company == "") {
-                                        companyErrorState = true
-                                    } else if (email == "") {
-                                        emailErrorState = true
-                                    } else if (!method.isValidMail(email)) {
-                                        emailErrorState = true
-                                    } else if (phone == "") {
-                                        phoneErrorState = true
+                        editText(name,
+                            resources.getString(R.string.name),
+                            resources.getString(R.string.please_enter_name),
+                            nameErrorState,
+                            nameFocusRequester,
+                            KeyboardOptions(keyboardType = KeyboardType.Text),
+                            onTextChanged = { name = it })
+                        editText(surname,
+                            resources.getString(R.string.sureName),
+                            resources.getString(R.string.please_enter_sureName),
+                            surnameErrorState,
+                            surnameFocusRequester,
+                            KeyboardOptions(keyboardType = KeyboardType.Text),
+                            onTextChanged = { surname = it })
+                        editText(company,
+                            resources.getString(R.string.company),
+                            resources.getString(R.string.please_enter_company),
+                            companyErrorState,
+                            companyFocusRequester,
+                            KeyboardOptions(keyboardType = KeyboardType.Text),
+                            onTextChanged = { company = it })
+                        editText(email,
+                            resources.getString(R.string.email),
+                            resources.getString(R.string.please_enter_email),
+                            emailErrorState,
+                            emailFocusRequester,
+                            KeyboardOptions(keyboardType = KeyboardType.Email),
+                            onTextChanged = { email = it })
+                        editText(phone,
+                            resources.getString(R.string.phoneNo),
+                            resources.getString(R.string.please_enter_phoneNo),
+                            phoneErrorState,
+                            phoneFocusRequester,
+                            KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            onTextChanged = { phone = it })
+                        ElevatedButton(
+                            onClick = {
+                                nameErrorState = false
+                                surnameErrorState = false
+                                companyErrorState = false
+                                emailErrorState = false
+                                phoneErrorState = false
+                                if (name == "") {
+                                    nameErrorState = true
+                                } else if (surname == "") {
+                                    surnameErrorState = true
+                                } else if (company == "") {
+                                    companyErrorState = true
+                                } else if (email == "") {
+                                    emailErrorState = true
+                                } else if (!method.isValidMail(email)) {
+                                    emailErrorState = true
+                                } else if (phone == "") {
+                                    phoneErrorState = true
+                                } else {
+                                    if (type == "create") {
+                                        createContactViewModel.insertData(
+                                            PhoneBook(
+                                                null, name, surname, company, email, phone
+                                            )
+                                        )
                                     } else {
-                                        if (type == "create") {
-                                            createContactViewModel.insertData(
-                                                PhoneBook(
-                                                    null, name, surname, company, email, phone
-                                                )
+                                        createContactViewModel.updateUserContact(
+                                            PhoneBook(
+                                                id.toInt(), name, surname, company, email, phone
                                             )
-                                        } else {
-                                            createContactViewModel.updateUserContact(
-                                                PhoneBook(
-                                                    id.toInt(), name, surname, company, email, phone
-                                                )
-                                            )
-                                        }
+                                        )
                                     }
+                                }
 
-                                },
-                                Modifier
-                                    .padding(top = 20.dp, bottom = 40.dp)
-                                    .align(Alignment.CenterHorizontally),
-                            ) {
-                                Text(
-                                    text = resources.getString(R.string.submit)
-                                )
-                            }
+                            },
+                            Modifier
+                                .padding(top = 20.dp, bottom = 40.dp)
+                                .align(Alignment.CenterHorizontally),
+                        ) {
+                            Text(
+                                text = resources.getString(R.string.submit)
+                            )
                         }
                     }
 
@@ -274,7 +280,7 @@ class CreateContactActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester = focusRequester)
-                .padding(top = 10.dp),
+                .padding(top = 10.dp, start = 20.dp, end = 20.dp),
             label = {
                 Text(label)
             },
