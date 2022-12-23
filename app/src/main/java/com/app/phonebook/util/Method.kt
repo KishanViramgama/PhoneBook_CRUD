@@ -1,47 +1,45 @@
 package com.app.phonebook.util
 
+import android.content.Context
 import android.util.Patterns
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.app.phonebook.R
+import javax.inject.Inject
 
-class Method {
+class Method @Inject constructor(private val context: Context) {
 
     fun isValidMail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     @Composable
-    fun Dialog() {
+    fun ShowMyDialog(yes: () -> Unit, no: () -> Unit, title: String, msg: String) {
         AlertDialog(onDismissRequest = {
             // Dismiss the dialog when the user clicks outside the dialog or on the back
             // button. If you want to disable that functionality, simply use an empty
             // onCloseRequest.
         },
             title = {
-                Text(text = "Title")
+                Text(title)
             },
             text = {
-                Text(
-                    "This area typically contains the supportive text " +
-                            "which presents the details regarding the Dialog's purpose."
-                )
+                Text(msg)
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
-                    }
+                    onClick = yes
                 ) {
-                    Text("Confirm")
+                    Text(context.resources.getString(R.string.yes))
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = {
-                    }
+                    onClick = no
                 ) {
-                    Text("Dismiss")
+                    Text(context.resources.getString(R.string.no))
                 }
             })
     }

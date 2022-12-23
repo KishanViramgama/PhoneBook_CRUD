@@ -97,7 +97,7 @@ class HomeActivity : ComponentActivity() {
                     Column {
                         TopAppBar(
                             title = { Text(text = resources.getString(R.string.home)) },
-                            colors = TopAppBarDefaults.topAppBarColors(containerColor = com.app.phonebook.theme.Purple80)
+                            colors = TopAppBarDefaults.topAppBarColors()
                         )
                         LazyColumn() {
                             items(phoneBook.size) {
@@ -130,7 +130,7 @@ class HomeActivity : ComponentActivity() {
                                             )
                                         }
                                         Text(
-                                            text = phoneBook[it].name,
+                                            text = phoneBook[it].name.toString(),
                                             modifier = Modifier
                                                 .padding(
                                                     start = 10.dp, end = 10.dp

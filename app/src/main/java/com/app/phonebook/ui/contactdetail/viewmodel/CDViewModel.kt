@@ -26,6 +26,7 @@ class CDViewModel @Inject constructor(private val context: Context,private val c
     fun callPhone(phoneNumber: String) {
         val intent = Intent(Intent.ACTION_DIAL)
         intent.data = Uri.parse("tel:$phoneNumber")
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
     }
 

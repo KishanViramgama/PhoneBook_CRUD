@@ -30,8 +30,8 @@ class Util {
 
     @Provides
     @Singleton
-    fun provideMethod(): Method {
-        return Method()
+    fun provideMethod(context: Context): Method {
+        return Method(context)
     }
 
     @Provides

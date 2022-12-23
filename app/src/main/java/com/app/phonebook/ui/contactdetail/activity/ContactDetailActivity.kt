@@ -42,8 +42,9 @@ class ContactDetailActivity : ComponentActivity() {
 
     private lateinit var id: String
     private var position: Int = 0
-    private var phoneBook: PhoneBook?= null
+    private var phoneBook: PhoneBook? = null
     private lateinit var ccdViewModel: CDViewModel
+    var showDialog by mutableStateOf(false)
 
     @Inject
     lateinit var method: Method
@@ -73,7 +74,6 @@ class ContactDetailActivity : ComponentActivity() {
                 }
             }
         }
-
         setContent {
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
@@ -113,12 +113,7 @@ class ContactDetailActivity : ComponentActivity() {
                                             .width(24.dp)
                                     )
                                 }
-                                IconButton(onClick = {
-                                    mutableLiveData.value =
-                                        LiveDataType.callObserver(null, position, Type.DELETE)
-                                    finish()
-                                    //method.Dialog()
-                                }) {
+                                IconButton(onClick = { showDialog = true }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_outline_delete),
                                         contentDescription = resources.getString(R.string.app_name),
@@ -144,7 +139,7 @@ class ContactDetailActivity : ComponentActivity() {
                         }
                         phoneBook?.let {
                             Text(
-                                text = it.name,
+                                text = it.name.toString(),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(top = 40.dp, start = 10.dp, end = 10.dp)
@@ -171,41 +166,56 @@ class ContactDetailActivity : ComponentActivity() {
                                         .fillMaxWidth()
                                         .padding(top = 10.dp, start = 10.dp)
                                 )
-                                /*Text(
-                                    text = getData(phoneBook.name),
+                                Text(
+                                    text = getData("phoneBook.name"),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData(phoneBook.surname),
+                                    text = getData("phoneBook.surname"),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData(phoneBook.company),
+                                    text = getData("phoneBook.company"),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData(phoneBook.email),
+                                    text = getData("phoneBook.email"),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData(phoneBook.phone),
+                                    text = getData("phoneBook.phone"),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
-                                )*/
+                                )
                             }
                         }
                     }
 
                 }
+            }
+            if (showDialog) {
+                method.ShowMyDialog(
+                    yes = {
+                        showDialog = false
+                        mutableLiveData.value =
+                            LiveDataType.callObserver(null, position, Type.DELETE)
+                        finish()
+                    },
+                    no = {
+                        showDialog = false
+                    },
+                    title = resources.getString(R.string.app_name),
+                    msg = resources.getString(R.string.delete_msg)
+                )
             }
         }
 
@@ -225,7 +235,7 @@ class ContactDetailActivity : ComponentActivity() {
                     .padding(top = 20.dp, bottom = 20.dp)
                     .weight(1f)
                     .clickable {
-                        ccdViewModel.callPhone("")
+                        ccdViewModel.callPhone("123456789")
                     },
                 painter = painterResource(id = R.drawable.ic_outline_call),
                 title = resources.getString(R.string.call)
@@ -271,6 +281,40 @@ class ContactDetailActivity : ComponentActivity() {
                 modifier = Modifier.padding(top = 10.dp)
             )
         }
+    }
+
+    @Composable
+    fun showMyDialog() {
+        AlertDialog(onDismissRequest = {
+            // Dismiss the dialog when the user clicks outside the dialog or on the back
+            // button. If you want to disable that functionality, simply use an empty
+            // onCloseRequest.
+        },
+            title = {
+                Text(text = "Title")
+            },
+            text = {
+                Text(
+                    "This area typically contains the supportive text " +
+                            "which presents the details regarding the Dialog's purpose."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                    }
+                ) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                    }
+                ) {
+                    Text("Dismiss")
+                }
+            })
     }
 
 }

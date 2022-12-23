@@ -12,6 +12,6 @@ class PhoneBook(
     @ColumnInfo(name = "surname") val surname: String,
     @ColumnInfo(name = "company") val company: String,
     @ColumnInfo(name = "email") val email: String,
-    @ColumnInfo(name = "phone")  val phone: String
+    @ColumnInfo(name = "phone") val phone: String
 ) : Serializable {
 }

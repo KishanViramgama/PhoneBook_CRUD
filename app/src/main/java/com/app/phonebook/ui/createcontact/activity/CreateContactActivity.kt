@@ -116,7 +116,7 @@ class CreateContactActivity : ComponentActivity() {
                     finish()
                     Toast.makeText(
                         this@CreateContactActivity,
-                        resources.getString(R.string.createContactSuccess),
+                        resources.getString(R.string.updateContactSuccess),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -150,6 +150,9 @@ class CreateContactActivity : ComponentActivity() {
         }
 
         setContent {
+
+            var nameErrorState by mutableStateOf(false)
+
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -160,7 +163,7 @@ class CreateContactActivity : ComponentActivity() {
                 ) {
                     Column {
                         TopAppBar(
-                            title = { Text(text = resources.getString(R.string.create_contact)) },
+                            title = { Text(text = title()) },
                             navigationIcon = {
                                 IconButton(onClick = { finish() }) {
                                     Icon(
@@ -293,8 +296,16 @@ class CreateContactActivity : ComponentActivity() {
                 text = errorMSg,
                 color = Color.Red,
                 fontSize = 12.sp,
-                modifier = Modifier.padding(start = 5.dp, top = 5.dp)
+                modifier = Modifier.padding(top = 5.dp, start = 25.dp, end = 25.dp)
             )
+        }
+    }
+
+    private fun title(): String {
+        return if (type == "edit") {
+            resources.getString(R.string.edit_contact)
+        } else {
+            resources.getString(R.string.create_contact)
         }
     }
 
