@@ -6,6 +6,7 @@
     <string name="edit_contact">Edit contact</string>
     <string name="contact_detail">Contact detail</string>
 
+    <string name="noDataFound">No data found</string>
     <string name="error">Some thing went to wrong</string>
     <string name="contactNotCreate">Contact not create</string>
 

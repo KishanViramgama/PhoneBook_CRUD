@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
@@ -42,12 +43,15 @@ class ContactDetailActivity : ComponentActivity() {
 
     private lateinit var id: String
     private var position: Int = 0
-    private var phoneBook: PhoneBook? = null
+    private var phoneBook by mutableStateOf(PhoneBook())
     private lateinit var ccdViewModel: CDViewModel
     var showDialog by mutableStateOf(false)
 
     @Inject
     lateinit var method: Method
+
+    @Inject
+    lateinit var liveData: LiveData<LiveDataType<PhoneBook>>
 
     @Inject
     lateinit var mutableLiveData: MutableLiveData<LiveDataType<PhoneBook>>
@@ -74,6 +78,15 @@ class ContactDetailActivity : ComponentActivity() {
                 }
             }
         }
+
+        liveData.observe(this) {
+            when (it.type) {
+                Type.UPDATE -> {
+                    phoneBook = it.data!!
+                }
+            }
+        }
+
         setContent {
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
@@ -137,15 +150,13 @@ class ContactDetailActivity : ComponentActivity() {
                                 text = "K", textAlign = TextAlign.Center
                             )
                         }
-                        phoneBook?.let {
-                            Text(
-                                text = it.name.toString(),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .padding(top = 40.dp, start = 10.dp, end = 10.dp)
-                                    .fillMaxWidth()
-                            )
-                        }
+                        Text(
+                            text = phoneBook.name,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(top = 40.dp, start = 10.dp, end = 10.dp)
+                                .fillMaxWidth()
+                        )
                         Divider(modifier = Modifier.padding(top = 20.dp))
                         View()
                         Divider()
@@ -159,6 +170,9 @@ class ContactDetailActivity : ComponentActivity() {
                                 )
                         ) {
                             Column() {
+                                Row() {
+                                    Icons
+                                }
                                 Text(
                                     text = resources.getString(R.string.contact_info),
                                     fontSize = 18.sp,
@@ -167,31 +181,31 @@ class ContactDetailActivity : ComponentActivity() {
                                         .padding(top = 10.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData("phoneBook.name"),
+                                    text = getData(phoneBook.name),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData("phoneBook.surname"),
+                                    text = getData(phoneBook.surname),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData("phoneBook.company"),
+                                    text = getData(phoneBook.company),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData("phoneBook.email"),
+                                    text = getData(phoneBook.email),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
                                 )
                                 Text(
-                                    text = getData("phoneBook.phone"),
+                                    text = getData(phoneBook.phone),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 5.dp, start = 10.dp)
@@ -231,19 +245,15 @@ class ContactDetailActivity : ComponentActivity() {
         Row {
             common(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, bottom = 20.dp)
                     .weight(1f)
                     .clickable {
-                        ccdViewModel.callPhone("123456789")
+                        ccdViewModel.callPhone(phoneBook.phone)
                     },
                 painter = painterResource(id = R.drawable.ic_outline_call),
                 title = resources.getString(R.string.call)
             )
             common(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, bottom = 20.dp)
                     .weight(1f)
                     .clickable { },
                 painter = painterResource(id = R.drawable.ic_outline_sms),
@@ -251,8 +261,6 @@ class ContactDetailActivity : ComponentActivity() {
             )
             common(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, bottom = 20.dp)
                     .weight(1f)
                     .clickable { },
                 painter = painterResource(id = R.drawable.ic_outline_videocam),
@@ -264,16 +272,18 @@ class ContactDetailActivity : ComponentActivity() {
     @Composable
     fun common(modifier: Modifier, painter: Painter, title: String) {
         Column(
-            modifier = modifier,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp, bottom = 20.dp),
             horizontalAlignment = CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Image(
+            Icon(
                 painter = painter,
                 contentDescription = title,
                 modifier = Modifier
-                    .height(32.dp)
-                    .width(32.dp)
+                    .height(28.dp)
+                    .width(28.dp)
             )
             Text(
                 text = title,
@@ -281,40 +291,6 @@ class ContactDetailActivity : ComponentActivity() {
                 modifier = Modifier.padding(top = 10.dp)
             )
         }
-    }
-
-    @Composable
-    fun showMyDialog() {
-        AlertDialog(onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
-        },
-            title = {
-                Text(text = "Title")
-            },
-            text = {
-                Text(
-                    "This area typically contains the supportive text " +
-                            "which presents the details regarding the Dialog's purpose."
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                    }
-                ) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                    }
-                ) {
-                    Text("Dismiss")
-                }
-            })
     }
 
 }

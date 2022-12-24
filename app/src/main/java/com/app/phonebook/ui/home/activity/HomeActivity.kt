@@ -42,6 +42,7 @@ class HomeActivity : ComponentActivity() {
 
     var phoneBook = mutableStateListOf<PhoneBook>()
     private var isShowProgress by mutableStateOf(true)
+    private var isShowNoDataFound by mutableStateOf(false)
 
     @Inject
     lateinit var liveData: LiveData<LiveDataType<PhoneBook>>
@@ -53,6 +54,9 @@ class HomeActivity : ComponentActivity() {
             when (it.type) {
                 Type.INSERT -> {
                     phoneBook.add(0, it.data!!)
+                    if (phoneBook.size != 0) {
+                        isShowNoDataFound = false
+                    }
                 }
                 Type.UPDATE -> {
                     phoneBook.removeAt(it.position)
@@ -71,8 +75,11 @@ class HomeActivity : ComponentActivity() {
             when (it.status) {
                 Status.SUCCESS -> {
                     if (it.data != null) {
-                        phoneBook.addAll(it.data)
-                        Log.d("data_information", it.data.size.toString())
+                        if (it.data.size != 0) {
+                            phoneBook.addAll(it.data)
+                        } else {
+                            isShowNoDataFound = true
+                        }
                     }
                     isShowProgress = false
                 }
@@ -153,7 +160,9 @@ class HomeActivity : ComponentActivity() {
                             )
                         }
                     }
-
+                    if (isShowNoDataFound) {
+                        noDataFound()
+                    }
                     Box(contentAlignment = Alignment.BottomEnd) {
                         ExtendedFloatingActionButton(modifier = Modifier
                             .wrapContentWidth()
@@ -192,6 +201,11 @@ class HomeActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .wrapContentHeight()
         }
+    }
+
+    @Composable
+    private fun noDataFound() {
+        Text(text = resources.getString(R.string.noDataFound))
     }
 
 }

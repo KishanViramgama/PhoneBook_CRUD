@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -157,11 +158,10 @@ class CreateContactActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
+                        .fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         TopAppBar(
                             title = { Text(text = title()) },
                             navigationIcon = {
@@ -178,35 +178,50 @@ class CreateContactActivity : ComponentActivity() {
                             resources.getString(R.string.please_enter_name),
                             nameErrorState,
                             nameFocusRequester,
-                            KeyboardOptions(keyboardType = KeyboardType.Text),
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next
+                            ),
                             onTextChanged = { name = it })
                         editText(surname,
                             resources.getString(R.string.sureName),
                             resources.getString(R.string.please_enter_sureName),
                             surnameErrorState,
                             surnameFocusRequester,
-                            KeyboardOptions(keyboardType = KeyboardType.Text),
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next
+                            ),
                             onTextChanged = { surname = it })
                         editText(company,
                             resources.getString(R.string.company),
                             resources.getString(R.string.please_enter_company),
                             companyErrorState,
                             companyFocusRequester,
-                            KeyboardOptions(keyboardType = KeyboardType.Text),
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next
+                            ),
                             onTextChanged = { company = it })
                         editText(email,
                             resources.getString(R.string.email),
                             resources.getString(R.string.please_enter_email),
                             emailErrorState,
                             emailFocusRequester,
-                            KeyboardOptions(keyboardType = KeyboardType.Email),
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            ),
                             onTextChanged = { email = it })
                         editText(phone,
                             resources.getString(R.string.phoneNo),
                             resources.getString(R.string.please_enter_phoneNo),
                             phoneErrorState,
                             phoneFocusRequester,
-                            KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Phone,
+                                imeAction = ImeAction.Done
+                            ),
                             onTextChanged = { phone = it })
                         ElevatedButton(
                             onClick = {
@@ -253,7 +268,6 @@ class CreateContactActivity : ComponentActivity() {
                             )
                         }
                     }
-
                 }
             }
         }
@@ -268,7 +282,7 @@ class CreateContactActivity : ComponentActivity() {
         errorMSg: String,
         isError: Boolean,
         focusRequester: FocusRequester,
-        keyboardOptions: KeyboardOptions = remember { KeyboardOptions.Default },
+        keyboardOptions: KeyboardOptions,
         onTextChanged: (String) -> Unit
     ) {
 

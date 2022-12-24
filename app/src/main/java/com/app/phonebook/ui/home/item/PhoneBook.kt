@@ -7,11 +7,11 @@ import java.io.Serializable
 
 @Entity
 class PhoneBook(
-    @PrimaryKey @ColumnInfo(name = "id") val id: Int?,
-    @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "surname") val surname: String,
-    @ColumnInfo(name = "company") val company: String,
-    @ColumnInfo(name = "email") val email: String,
-    @ColumnInfo(name = "phone") val phone: String
+    @PrimaryKey @ColumnInfo(name = "id") val id: Int? = null,
+    @ColumnInfo(name = "name") val name: String = "",
+    @ColumnInfo(name = "surname") val surname: String = "",
+    @ColumnInfo(name = "company") val company: String = "",
+    @ColumnInfo(name = "email") val email: String = "",
+    @ColumnInfo(name = "phone") val phone: String = ""
 ) : Serializable {
 }
