@@ -10,4 +10,8 @@ class CDRepository @Inject constructor(private val databaseClient: DatabaseClien
         return databaseClient.appDatabase.userTask()!!.getSingleContact(id)
     }
 
+    suspend fun deleteUserContact(id: String): Int {
+        return databaseClient.appDatabase.userTask()!!.deleteContactById(id)
+    }
+
 }

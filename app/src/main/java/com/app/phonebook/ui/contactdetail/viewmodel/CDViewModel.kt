@@ -23,6 +23,9 @@ class CDViewModel @Inject constructor(private val context: Context,private val c
     private val singleContactLiveData: MutableLiveData<Resource<PhoneBook>> = MutableLiveData()
     val getSingleContact: LiveData<Resource<PhoneBook>> = singleContactLiveData
 
+    private val deleteContactMutableLiveData: MutableLiveData<Resource<String>> = MutableLiveData()
+    val deleteSingleContact: LiveData<Resource<String>> = deleteContactMutableLiveData
+
     fun callPhone(phoneNumber: String) {
         val intent = Intent(Intent.ACTION_DIAL)
         intent.data = Uri.parse("tel:$phoneNumber")
@@ -40,6 +43,21 @@ class CDViewModel @Inject constructor(private val context: Context,private val c
                         context.resources.getString(R.string.error), null
                     )
                 )
+            }
+        }
+    }
+
+    fun deleteContact(id:String){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val id:Int=cdRepository.deleteUserContact(id)
+                if (id>0) {
+                    deleteContactMutableLiveData.postValue(Resource.success(id.toString()))
+                }else{
+                    deleteContactMutableLiveData.postValue(Resource.error(context.resources.getString(R.string.dataNoDelete),null))
+                }
+            }catch (e:Exception){
+                deleteContactMutableLiveData.postValue(Resource.error(context.resources.getString(R.string.error),null))
             }
         }
     }

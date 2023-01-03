@@ -20,6 +20,6 @@ interface DataEntity {
     fun getSingleContact(id: String): PhoneBook
 
     @Query("DELETE FROM PhoneBook WHERE id = :id")
-    suspend fun deleteContactById(id: Int)
+    suspend fun deleteContactById(id: String) :Int
 
 }

@@ -79,6 +79,23 @@ class ContactDetailActivity : ComponentActivity() {
             }
         }
 
+        ccdViewModel.deleteSingleContact.observe(this) {
+            when (it.status) {
+                Status.SUCCESS -> {
+                    mutableLiveData.value =
+                        LiveDataType.callObserver(null, position, Type.DELETE)
+                    finish()
+                }
+                Status.LOADING -> {
+                }
+                Status.ERROR -> {
+                    Toast.makeText(
+                        this, it.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
         liveData.observe(this) {
             when (it.type) {
                 Type.UPDATE -> {
@@ -220,9 +237,7 @@ class ContactDetailActivity : ComponentActivity() {
                 method.ShowMyDialog(
                     yes = {
                         showDialog = false
-                        mutableLiveData.value =
-                            LiveDataType.callObserver(null, position, Type.DELETE)
-                        finish()
+                        ccdViewModel.deleteContact(id)
                     },
                     no = {
                         showDialog = false
