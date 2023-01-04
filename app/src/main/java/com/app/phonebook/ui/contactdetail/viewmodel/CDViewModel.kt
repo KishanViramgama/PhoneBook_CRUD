@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CDViewModel @Inject constructor(private val context: Context,private val cdRepository: CDRepository) : ViewModel() {
+class CDViewModel @Inject constructor(
+    private val context: Context,
+    private val cdRepository: CDRepository
+) : ViewModel() {
 
     private val singleContactLiveData: MutableLiveData<Resource<PhoneBook>> = MutableLiveData()
     val getSingleContact: LiveData<Resource<PhoneBook>> = singleContactLiveData
@@ -36,7 +39,13 @@ class CDViewModel @Inject constructor(private val context: Context,private val c
     fun getSingleContact(id: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                singleContactLiveData.postValue(Resource.success(cdRepository.getSingleUserContact(id)))
+                singleContactLiveData.postValue(
+                    Resource.success(
+                        cdRepository.getSingleUserContact(
+                            id
+                        )
+                    )
+                )
             } catch (e: Exception) {
                 singleContactLiveData.postValue(
                     Resource.error(
@@ -47,17 +56,28 @@ class CDViewModel @Inject constructor(private val context: Context,private val c
         }
     }
 
-    fun deleteContact(id:String){
+    fun deleteContact(id: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val id:Int=cdRepository.deleteUserContact(id)
-                if (id>0) {
+                val id: Int = cdRepository.deleteUserContact(id)
+                if (id > 0) {
                     deleteContactMutableLiveData.postValue(Resource.success(id.toString()))
-                }else{
-                    deleteContactMutableLiveData.postValue(Resource.error(context.resources.getString(R.string.dataNoDelete),null))
+                } else {
+                    deleteContactMutableLiveData.postValue(
+                        Resource.error(
+                            context.resources.getString(
+                                R.string.dataNoDelete
+                            ), null
+                        )
+                    )
                 }
-            }catch (e:Exception){
-                deleteContactMutableLiveData.postValue(Resource.error(context.resources.getString(R.string.error),null))
+            } catch (e: Exception) {
+                deleteContactMutableLiveData.postValue(
+                    Resource.error(
+                        context.resources.getString(R.string.error),
+                        null
+                    )
+                )
             }
         }
     }

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -136,7 +137,7 @@ class ContactDetailActivity : ComponentActivity() {
                                     )
                                 }) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.ic_outline_edit),
+                                        painter = painterResource(id = R.drawable.ic_edit),
                                         contentDescription = resources.getString(R.string.app_name),
                                         modifier = Modifier
                                             .height(24.dp)
@@ -145,7 +146,7 @@ class ContactDetailActivity : ComponentActivity() {
                                 }
                                 IconButton(onClick = { showDialog = true }) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.ic_outline_delete),
+                                        painter = painterResource(id = R.drawable.ic_delete),
                                         contentDescription = resources.getString(R.string.app_name),
                                         modifier = Modifier
                                             .height(24.dp)
@@ -157,21 +158,24 @@ class ContactDetailActivity : ComponentActivity() {
                             modifier = Modifier.align(CenterHorizontally),
                             contentAlignment = Alignment.Center
                         ) {
-                            Canvas(modifier = Modifier.size(120.dp), onDraw = {
-                                val size = 120.dp.toPx()
+                            Canvas(modifier = Modifier.size(100.dp), onDraw = {
+                                val size = 100.dp.toPx()
                                 drawCircle(
                                     color = Color.Magenta, radius = size / 2f
                                 )
                             })
                             Text(
-                                text = "K", textAlign = TextAlign.Center
+                                text = "K", textAlign = TextAlign.Center, fontSize = 38.sp
                             )
                         }
                         Text(
                             text = phoneBook.name,
                             textAlign = TextAlign.Center,
+                            fontSize = 22.sp,
                             modifier = Modifier
-                                .padding(top = 40.dp, start = 10.dp, end = 10.dp)
+                                .padding(
+                                    top = 40.dp, start = 10.dp, end = 10.dp
+                                )
                                 .fillMaxWidth()
                         )
                         Divider(modifier = Modifier.padding(top = 20.dp))
@@ -181,51 +185,45 @@ class ContactDetailActivity : ComponentActivity() {
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(250.dp)
                                 .padding(
                                     top = 25.dp, start = 20.dp, end = 20.dp, bottom = 20.dp
                                 )
                         ) {
-                            Column() {
-                                Row() {
-                                    Icons
-                                }
+                            Column(
+                                modifier = Modifier.padding(
+                                    start = 10.dp,
+                                    end = 10.dp,
+                                    top = 15.dp,
+                                    bottom = 15.dp
+                                )
+                            ) {
                                 Text(
                                     text = resources.getString(R.string.contact_info),
                                     fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(top = 10.dp, start = 10.dp)
                                 )
-                                Text(
-                                    text = getData(phoneBook.name),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 5.dp, start = 10.dp)
+                                userInformation(
+                                    title = phoneBook.name,
+                                    idImage = R.drawable.ic_user,
+                                    modifier = Modifier.padding(top = 10.dp)
                                 )
-                                Text(
-                                    text = getData(phoneBook.surname),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 5.dp, start = 10.dp)
+                                userInformation(
+                                    title = phoneBook.surname,
+                                    idImage = R.drawable.ic_user
                                 )
-                                Text(
-                                    text = getData(phoneBook.company),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 5.dp, start = 10.dp)
+                                userInformation(
+                                    title = phoneBook.company,
+                                    idImage = R.drawable.ic_work
                                 )
-                                Text(
-                                    text = getData(phoneBook.email),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 5.dp, start = 10.dp)
+                                userInformation(
+                                    title = phoneBook.email,
+                                    idImage = R.drawable.ic_email
                                 )
-                                Text(
-                                    text = getData(phoneBook.phone),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 5.dp, start = 10.dp)
+                                userInformation(
+                                    title = phoneBook.phone,
+                                    idImage = R.drawable.ic_call
                                 )
                             }
                         }
@@ -250,7 +248,7 @@ class ContactDetailActivity : ComponentActivity() {
 
     }
 
-    fun getData(string: String?): String {
+    private fun getData(string: String?): String {
         return string ?: ""
     }
 
@@ -264,25 +262,26 @@ class ContactDetailActivity : ComponentActivity() {
                     .clickable {
                         ccdViewModel.callPhone(phoneBook.phone)
                     },
-                painter = painterResource(id = R.drawable.ic_outline_call),
+                painter = painterResource(id = R.drawable.ic_call),
                 title = resources.getString(R.string.call)
             )
             common(
                 modifier = Modifier
                     .weight(1f)
                     .clickable { },
-                painter = painterResource(id = R.drawable.ic_outline_sms),
+                painter = painterResource(id = R.drawable.ic_sms),
                 title = resources.getString(R.string.sms)
             )
             common(
                 modifier = Modifier
                     .weight(1f)
                     .clickable { },
-                painter = painterResource(id = R.drawable.ic_outline_videocam),
+                painter = painterResource(id = R.drawable.ic_videocam),
                 title = resources.getString(R.string.video)
             )
         }
     }
+
 
     @Composable
     fun common(modifier: Modifier, painter: Painter, title: String) {
@@ -304,6 +303,26 @@ class ContactDetailActivity : ComponentActivity() {
                 text = title,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 10.dp)
+            )
+        }
+    }
+
+    @Composable
+    private fun userInformation(title: String, idImage: Int, modifier: Modifier = Modifier) {
+        Row(modifier = modifier.padding(top = 10.dp)) {
+            Icon(
+                painter = painterResource(id = idImage),
+                contentDescription = title,
+                modifier = Modifier
+                    .height(24.dp)
+                    .width(24.dp)
+            )
+            Text(
+                text = getData(title),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 10.dp)
             )
         }
     }

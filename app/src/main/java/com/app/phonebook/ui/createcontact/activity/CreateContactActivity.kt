@@ -152,8 +152,6 @@ class CreateContactActivity : ComponentActivity() {
 
         setContent {
 
-            var nameErrorState by mutableStateOf(false)
-
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
