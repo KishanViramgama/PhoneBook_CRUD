@@ -1,5 +1,5 @@
 # PhoneBook_CRUD
-This project is simple concept of  jetpack compose and room database crud operation.
+This project is simple concept of jetpack compose and room database crud operation.
 
 <h3>Using</h3>
 <ul>
