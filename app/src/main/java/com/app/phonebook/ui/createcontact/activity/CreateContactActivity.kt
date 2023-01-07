@@ -27,10 +27,8 @@ import com.app.phonebook.R
 import com.app.phonebook.theme.PhoneBookTheme
 import com.app.phonebook.ui.createcontact.viewmodel.CCViewModel
 import com.app.phonebook.ui.home.item.PhoneBook
-import com.app.phonebook.util.LiveDataType
-import com.app.phonebook.util.Method
-import com.app.phonebook.util.Status
-import com.app.phonebook.util.Type
+import com.app.phonebook.util.*
+import com.app.phonebook.util.Base.maxPhoneNumber
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -67,12 +65,16 @@ class CreateContactActivity : ComponentActivity() {
     //Email
     private var email by mutableStateOf("")
     private var emailErrorState by mutableStateOf(false)
+    private var validEmailErrorState = true
     private val emailFocusRequester = FocusRequester()
 
     //Phone no
     private var phone by mutableStateOf("")
     private var phoneErrorState by mutableStateOf(false)
     private val phoneFocusRequester = FocusRequester()
+
+    //Show loading
+    private var isShowLoading by mutableStateOf(false)
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,9 +89,10 @@ class CreateContactActivity : ComponentActivity() {
             createContactViewModel.getSingleContact(id)
         }
 
-        createContactViewModel.insertContactObservable.observe(this) {
+        createContactViewModel.insertContactLiveData.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
+                    isShowLoading = false
                     mutableLiveData.value =
                         LiveDataType.callObserver(it.data, position, Type.INSERT)
                     finish()
@@ -100,8 +103,10 @@ class CreateContactActivity : ComponentActivity() {
                     ).show()
                 }
                 Status.LOADING -> {
+                    isShowLoading = true
                 }
                 Status.ERROR -> {
+                    isShowLoading = false
                     Toast.makeText(
                         this, it.message, Toast.LENGTH_SHORT
                     ).show()
@@ -109,7 +114,7 @@ class CreateContactActivity : ComponentActivity() {
             }
         }
 
-        createContactViewModel.userContactUpdateObservable.observe(this) {
+        createContactViewModel.userContactUpdateLiveData.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
                     mutableLiveData.value =
@@ -131,7 +136,7 @@ class CreateContactActivity : ComponentActivity() {
             }
         }
 
-        createContactViewModel.getSingleContact.observe(this) {
+        createContactViewModel.singleContactLiveData.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
                     name = it.data?.name.toString()
@@ -155,9 +160,7 @@ class CreateContactActivity : ComponentActivity() {
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         TopAppBar(
@@ -177,8 +180,7 @@ class CreateContactActivity : ComponentActivity() {
                             nameErrorState,
                             nameFocusRequester,
                             KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Next
+                                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                             ),
                             onTextChanged = { name = it })
                         editText(surname,
@@ -187,8 +189,7 @@ class CreateContactActivity : ComponentActivity() {
                             surnameErrorState,
                             surnameFocusRequester,
                             KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Next
+                                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                             ),
                             onTextChanged = { surname = it })
                         editText(company,
@@ -197,30 +198,32 @@ class CreateContactActivity : ComponentActivity() {
                             companyErrorState,
                             companyFocusRequester,
                             KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Next
+                                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                             ),
                             onTextChanged = { company = it })
                         editText(email,
                             resources.getString(R.string.email),
-                            resources.getString(R.string.please_enter_email),
+                            if (validEmailErrorState) resources.getString(R.string.please_enter_email) else resources.getString(
+                                R.string.please_enter_valid_email
+                            ),
                             emailErrorState,
                             emailFocusRequester,
                             KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
+                                keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
                             ),
                             onTextChanged = { email = it })
-                        editText(phone,
+                        editText(
+                            phone,
                             resources.getString(R.string.phoneNo),
                             resources.getString(R.string.please_enter_phoneNo),
                             phoneErrorState,
                             phoneFocusRequester,
                             KeyboardOptions(
-                                keyboardType = KeyboardType.Phone,
-                                imeAction = ImeAction.Done
+                                keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done
                             ),
-                            onTextChanged = { phone = it })
+                            onTextChanged = { phone = it },
+                            maxPhoneNumber
+                        )
                         ElevatedButton(
                             onClick = {
                                 nameErrorState = false
@@ -228,29 +231,41 @@ class CreateContactActivity : ComponentActivity() {
                                 companyErrorState = false
                                 emailErrorState = false
                                 phoneErrorState = false
-                                if (name == "") {
+                                if (name.trim() == "") {
                                     nameErrorState = true
-                                } else if (surname == "") {
+                                } else if (surname.trim() == "") {
                                     surnameErrorState = true
-                                } else if (company == "") {
+                                } else if (company.trim() == "") {
                                     companyErrorState = true
-                                } else if (email == "") {
+                                } else if (email.trim() == "") {
+                                    validEmailErrorState = true
                                     emailErrorState = true
-                                } else if (!method.isValidMail(email)) {
+                                } else if (!isValidMail(email.trim())) {
+                                    validEmailErrorState = false
                                     emailErrorState = true
-                                } else if (phone == "") {
+                                } else if (phone.trim() == "") {
                                     phoneErrorState = true
                                 } else {
                                     if (type == "create") {
                                         createContactViewModel.insertData(
                                             PhoneBook(
-                                                null, name, surname, company, email, phone
+                                                null,
+                                                name.trim(),
+                                                surname.trim(),
+                                                company.trim(),
+                                                email.trim(),
+                                                phone.trim()
                                             )
                                         )
                                     } else {
                                         createContactViewModel.updateUserContact(
                                             PhoneBook(
-                                                id.toInt(), name, surname, company, email, phone
+                                                id.toInt(),
+                                                name.trim(),
+                                                surname.trim(),
+                                                company.trim(),
+                                                email.trim(),
+                                                phone.trim()
                                             )
                                         )
                                     }
@@ -265,6 +280,7 @@ class CreateContactActivity : ComponentActivity() {
                                 text = resources.getString(R.string.submit)
                             )
                         }
+                        method.ShowLoader(isShowLoading)
                     }
                 }
             }
@@ -281,7 +297,8 @@ class CreateContactActivity : ComponentActivity() {
         isError: Boolean,
         focusRequester: FocusRequester,
         keyboardOptions: KeyboardOptions,
-        onTextChanged: (String) -> Unit
+        onTextChanged: (String) -> Unit,
+        maxNumber: Int = 0
     ) {
 
         var name by mutableStateOf(textName)
@@ -289,8 +306,15 @@ class CreateContactActivity : ComponentActivity() {
         OutlinedTextField(
             value = name,
             onValueChange = {
-                name = it
-                onTextChanged(it)
+                if (maxNumber == 0) {
+                    name = it
+                    onTextChanged(it)
+                } else {
+                    if (it.length <= maxNumber) {
+                        name = it
+                        onTextChanged(it)
+                    }
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

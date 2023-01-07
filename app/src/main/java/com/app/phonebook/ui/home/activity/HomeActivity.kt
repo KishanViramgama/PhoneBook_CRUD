@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,8 +18,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.app.phonebook.R
@@ -54,9 +55,7 @@ class HomeActivity : ComponentActivity() {
             when (it.type) {
                 Type.INSERT -> {
                     phoneBook.add(0, it.data!!)
-                    if (phoneBook.size != 0) {
-                        isShowNoDataFound = false
-                    }
+                    isShowNoDataFound = phoneBook.size == 0
                 }
                 Type.UPDATE -> {
                     phoneBook.removeAt(it.position)
@@ -64,18 +63,19 @@ class HomeActivity : ComponentActivity() {
                 }
                 Type.DELETE -> {
                     phoneBook.removeAt(it.position)
+                    isShowNoDataFound = phoneBook.size == 0
                 }
             }
-            Log.d("data_information", "Call live data")
         }
 
         val contactViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         contactViewModel.getData()
-        contactViewModel.getDataPhoneBook.observe(this@HomeActivity) {
+        contactViewModel.phoneBookLiveData.observe(this@HomeActivity) {
             when (it.status) {
                 Status.SUCCESS -> {
                     if (it.data != null) {
                         if (it.data.size != 0) {
+                            isShowNoDataFound = false
                             phoneBook.addAll(it.data)
                         } else {
                             isShowNoDataFound = true
@@ -112,8 +112,7 @@ class HomeActivity : ComponentActivity() {
                                     modifier = lazyColumnModifier(it).clickable {
                                         startActivity(
                                             Intent(
-                                                this@HomeActivity,
-                                                ContactDetailActivity::class.java
+                                                this@HomeActivity, ContactDetailActivity::class.java
                                             ).putExtra("id", phoneBook[it].id)
                                                 .putExtra("position", it)
                                         )
@@ -131,9 +130,11 @@ class HomeActivity : ComponentActivity() {
                                                 )
                                             })
                                             Text(
-                                                text = "K", modifier = Modifier.padding(
+                                                text = phoneBook[it].name[0].toString(),
+                                                modifier = Modifier.padding(
                                                     start = 10.dp, end = 10.dp
-                                                ), textAlign = TextAlign.Center
+                                                ),
+                                                textAlign = TextAlign.Center
                                             )
                                         }
                                         Text(
@@ -205,7 +206,13 @@ class HomeActivity : ComponentActivity() {
 
     @Composable
     private fun noDataFound() {
-        Text(text = resources.getString(R.string.noDataFound))
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = resources.getString(R.string.noDataFound),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+            )
+        }
     }
 
 }

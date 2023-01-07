@@ -57,6 +57,9 @@ class ContactDetailActivity : ComponentActivity() {
     @Inject
     lateinit var mutableLiveData: MutableLiveData<LiveDataType<PhoneBook>>
 
+    //Show loading
+    private var isShowLoading by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -65,14 +68,17 @@ class ContactDetailActivity : ComponentActivity() {
 
         ccdViewModel = ViewModelProvider(this)[CDViewModel::class.java]
         ccdViewModel.getSingleContact(id)
-        ccdViewModel.getSingleContact.observe(this) {
+        ccdViewModel.singleContactLiveData.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
+                    isShowLoading = false
                     phoneBook = it.data!!
                 }
                 Status.LOADING -> {
+                    isShowLoading = true
                 }
                 Status.ERROR -> {
+                    isShowLoading = false
                     Toast.makeText(
                         this, it.message, Toast.LENGTH_SHORT
                     ).show()
@@ -80,16 +86,18 @@ class ContactDetailActivity : ComponentActivity() {
             }
         }
 
-        ccdViewModel.deleteSingleContact.observe(this) {
+        ccdViewModel.deleteSingleContactLiveData.observe(this) {
             when (it.status) {
                 Status.SUCCESS -> {
-                    mutableLiveData.value =
-                        LiveDataType.callObserver(null, position, Type.DELETE)
+                    isShowLoading = false
+                    mutableLiveData.value = LiveDataType.callObserver(null, position, Type.DELETE)
                     finish()
                 }
                 Status.LOADING -> {
+                    isShowLoading = true
                 }
                 Status.ERROR -> {
+                    isShowLoading = false
                     Toast.makeText(
                         this, it.message, Toast.LENGTH_SHORT
                     ).show()
@@ -109,12 +117,10 @@ class ContactDetailActivity : ComponentActivity() {
             PhoneBookTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
+                        modifier = Modifier.verticalScroll(rememberScrollState())
                     ) {
                         TopAppBar(title = { Text(text = resources.getString(R.string.contact_detail)) },
                             Modifier.background(color = Color.Magenta),
@@ -165,7 +171,9 @@ class ContactDetailActivity : ComponentActivity() {
                                 )
                             })
                             Text(
-                                text = "K", textAlign = TextAlign.Center, fontSize = 38.sp
+                                text = if (phoneBook.name == "") "" else phoneBook.name[0].toString(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 38.sp
                             )
                         }
                         Text(
@@ -191,18 +199,14 @@ class ContactDetailActivity : ComponentActivity() {
                         ) {
                             Column(
                                 modifier = Modifier.padding(
-                                    start = 10.dp,
-                                    end = 10.dp,
-                                    top = 15.dp,
-                                    bottom = 15.dp
+                                    start = 10.dp, end = 10.dp, top = 15.dp, bottom = 15.dp
                                 )
                             ) {
                                 Text(
                                     text = resources.getString(R.string.contact_info),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                                 userInformation(
                                     title = phoneBook.name,
@@ -210,20 +214,16 @@ class ContactDetailActivity : ComponentActivity() {
                                     modifier = Modifier.padding(top = 10.dp)
                                 )
                                 userInformation(
-                                    title = phoneBook.surname,
-                                    idImage = R.drawable.ic_user
+                                    title = phoneBook.surname, idImage = R.drawable.ic_user
                                 )
                                 userInformation(
-                                    title = phoneBook.company,
-                                    idImage = R.drawable.ic_work
+                                    title = phoneBook.company, idImage = R.drawable.ic_work
                                 )
                                 userInformation(
-                                    title = phoneBook.email,
-                                    idImage = R.drawable.ic_email
+                                    title = phoneBook.email, idImage = R.drawable.ic_email
                                 )
                                 userInformation(
-                                    title = phoneBook.phone,
-                                    idImage = R.drawable.ic_call
+                                    title = phoneBook.phone, idImage = R.drawable.ic_call
                                 )
                             }
                         }
@@ -231,6 +231,7 @@ class ContactDetailActivity : ComponentActivity() {
 
                 }
             }
+            method.ShowLoader(isShowLoading)
             if (showDialog) {
                 method.ShowMyDialog(
                     yes = {
@@ -268,7 +269,7 @@ class ContactDetailActivity : ComponentActivity() {
             common(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable { },
+                    .clickable { ccdViewModel.sms() },
                 painter = painterResource(id = R.drawable.ic_sms),
                 title = resources.getString(R.string.sms)
             )
@@ -300,9 +301,7 @@ class ContactDetailActivity : ComponentActivity() {
                     .width(28.dp)
             )
             Text(
-                text = title,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 10.dp)
+                text = title, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 10.dp)
             )
         }
     }

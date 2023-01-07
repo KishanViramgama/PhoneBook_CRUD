@@ -6,9 +6,14 @@
     <string name="edit_contact">Edit contact</string>
     <string name="contact_detail">Contact detail</string>
 
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="loading">Loading....</string>
     <string name="noDataFound">No data found</string>
-    <string name="error">Some thing went to wrong</string>
+    <string name="wrong">Some thing went to wrong</string>
     <string name="contactNotCreate">Contact not create</string>
+    <string name="delete_msg">Are you sure you want to delete this contact details</string>
+    <string name="dataNoDelete">User contact not deleted successfully please try again later</string>
 
     <string name="submit">Submit</string>
 
@@ -22,19 +27,15 @@
     <string name="please_enter_sureName">Please enter sure name</string>
     <string name="please_enter_company">Please enter company</string>
     <string name="please_enter_email">Please enter email</string>
+    <string name="please_enter_valid_email">Please enter valid email</string>
     <string name="please_enter_phoneNo">Please enter phone no</string>
 
     <string name="createContactSuccess">Create contact success fully</string>
     <string name="updateContactSuccess">Update contact success fully</string>
 
-    <string name="call">Call</string>
     <string name="sms">Sms</string>
+    <string name="call">Call</string>
     <string name="video">Video</string>
-
     <string name="contact_info">Contact info</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-    <string name="delete_msg">Are you sure you want to delete this contact details</string>
-    <string name="dataNoDelete">User contact not deleted successfully please try again later</string>
 
 </resources>

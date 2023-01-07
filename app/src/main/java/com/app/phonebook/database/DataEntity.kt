@@ -2,7 +2,6 @@ package com.app.phonebook.database
 
 import androidx.room.*
 import com.app.phonebook.ui.home.item.PhoneBook
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DataEntity {
@@ -25,6 +24,6 @@ interface DataEntity {
 
     //Delete single contact
     @Query("DELETE FROM PhoneBook WHERE id = :id")
-    suspend fun deleteContactById(id: String) :Int
+    suspend fun deleteContactById(id: String): Int
 
 }

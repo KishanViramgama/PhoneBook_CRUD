@@ -35,8 +35,9 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".ui.createcontact.activity.CreateContactActivity"
-            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".ui.createcontact.activity.CreateContactActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
