@@ -1,6 +1,8 @@
 # PhoneBook_CRUD
 This project is simple concept of jetpack compose and room database crud operation.
 
+<img src="https://github.com/KishanViramgama/PhoneBook_CRUD/blob/main/PhoneBook.gif" height="368px" align="right" style="max-width:100%;"></ima>
+
 <h3>Using</h3>
 <ul>
   <li>MVVM</li>
